@@ -95,12 +95,15 @@ export default function Home() {
               © 2025 AI Listener. Nurturing minds in the digital realm.
             </p>
             <div className="flex gap-4">
-              <Link href="/privacy" className="text-sm text-gray-700 hover:text-green-600 transition-colors">
-                Privacy
-              </Link>
-              <Link href="/terms" className="text-sm text-gray-700 hover:text-green-600 transition-colors">
-                Terms
-              </Link>
+              <span className="text-sm text-gray-700">
+                Made by{" "}
+                <Link
+                  href="https://github.com/Devesh36"
+                  className="hover:text-green-600 transition-colors font-bold"
+                >
+                  Devesh
+                </Link>
+              </span>
             </div>
           </div>
         </div>
