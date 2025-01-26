@@ -18,7 +18,7 @@ export async function POST(req: Request) {
     messages: [
       {
         role: "system",
-        content: "You are an AI therapist. Provide empathetic and supportive responses.",
+        content: "You are an AI listener. Provide empathetic and supportive responses with compassion.",
       },
       ...messages,
     ],
