@@ -9,7 +9,7 @@ export async function POST(req: Request) {
 
   // Initialize OpenAI client with API key
   const openaiClient = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY, // Ensure OPENAI_API_KEY is set in your environment variables
+    apiKey: process.env.GEMINI_API_KEY, // Ensure OPENAI_API_KEY is set in your environment variables
   });
 
   // Use the new streamText API with OpenAI adapter
