@@ -4,11 +4,17 @@ import { useState, useRef, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
-import { useChat } from "ai/react"
 import { ArrowUpIcon, ReloadIcon } from "@radix-ui/react-icons"
 
+interface Message {
+  role: "user" | "assistant"
+  content: string
+}
+
 export function ChatInterface() {
-  const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat()
+  const [messages, setMessages] = useState<Message[]>([])
+  const [input, setInput] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -21,10 +27,62 @@ export function ChatInterface() {
     scrollToBottom()
   }, [messages])
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInput(e.target.value)
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!input.trim()) return
+
+    const userMessage: Message = { role: "user", content: input }
+    setMessages(prev => [...prev, userMessage])
+    setInput("")
+    setIsLoading(true)
+
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: [...messages, userMessage] }),
+      })
+
+      if (!response.ok) throw new Error("Failed to get response")
+
+      const reader = response.body?.getReader()
+      if (!reader) throw new Error("No response body")
+
+      let assistantMessage = ""
+      const decoder = new TextDecoder()
+
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+
+        const chunk = decoder.decode(value)
+        assistantMessage += chunk
+        setMessages(prev => {
+          const newMessages = [...prev]
+          if (newMessages[newMessages.length - 1]?.role === "assistant") {
+            newMessages[newMessages.length - 1].content = assistantMessage
+          } else {
+            newMessages.push({ role: "assistant", content: assistantMessage })
+          }
+          return newMessages
+        })
+      }
+    } catch (error) {
+      console.error("Error:", error)
+      setMessages(prev => [...prev, { role: "assistant", content: "Sorry, an error occurred." }])
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault()
-      handleSubmit(e)
+      handleSubmit(e as any)
     }
   }
 
