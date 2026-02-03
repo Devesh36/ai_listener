@@ -1,4 +1,4 @@
-import { createGoogleGenerativeAI } from '@ai-sdk/google';
+import { createGroq } from '@ai-sdk/groq';
 import { streamText } from "ai";
 
 export const runtime = "edge";
@@ -6,13 +6,13 @@ export const runtime = "edge";
 export async function POST(req: Request) {
   const { messages } = await req.json();
 
-  const google = createGoogleGenerativeAI({
-    apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
+  const groq = createGroq({
+    apiKey: process.env.GROQ_API_KEY,
   });
 
-  // Use the new streamText API with Google Gemini adapter
+  // Use the new streamText API with Groq adapter
   const result = await streamText({
-    model: google("gemini-2.0-flash"),
+    model: groq("llama-3.3-70b-versatile"),
     messages: [
       {
         role: "system",
